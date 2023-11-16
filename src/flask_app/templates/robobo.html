@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<title>Robobo</title>
+
+<body>
+<div style="width: 80%; margin: auto; text-align: center; align-items: center; justify-content: center;">
+<h1>Robobo</h1>
+
+<div class="section" style="width: fit-content;">
+<h2>Dane</h2>
+<form method="POST" style="display: flex; flex-wrap: wrap;">
+    <table border="1px solid black">
+        <tr>
+            <td colspan="2">punkt P</td>
+            <td colspan="2">prosta L</td>
+            <td colspan="2">okrąg</td>
+        </tr>
+        <tr>
+            <td>x [mm]</td>
+            <td>y [mm]</td>
+            <td>&alpha; [&deg;]</td>
+            <td>L [mm]</td>
+            <td>R [mm]</td>
+            <td>&delta; [&deg;]</td>
+        </tr>
+        <tr>
+            <td><input type="text" name="x" value={{x}}></td>
+            <td><input type="text" name="y" value={{y}}></td>
+            <td><input type="text" name="alpha" value={{alpha}}></td>
+            <td><input type="text" name="L" value={{L}}></td>
+            <td><input type="text" name="R" value={{R}}></td>
+            <td><input type="text" name="delta" value={{delta}}></td>
+        </tr>
+    </table>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 100%;">
+        <div style="border: 1px solid black; width: fit-content; margin: 10px;">
+            n = 
+            <input type="text" name="n" title="n" size="3" value={{n}}>
+            <input type="submit" name="submit_button" value="Oblicz dla n">
+        </div>
+        <div style="border: 1px solid black; width: fit-content; margin: 10px;">
+            <input type="submit" name="submit_button" value="Oblicz">
+        </div>
+    </div>
+</form>
+</div>
+{% if mathml is defined %}
+<div class="section" style="width: fit-content; display: flex;">
+<div>
+    <h2>Schemat</h2>
+    <img src="/robotics/robobo/plot?R={{R}}&L={{L}}&delta={{delta}}&alpha={{alpha}}&x={{x}}&y={{y}}&n={{n}}">
+</div>
+<div style="width: fit-content;">
+<h2>Obliczenia</h2>
+{{ mathml | safe }}
+</div>
+</div>
+{% endif %}
+
+<!--{% if plotQuery is defined %}-->
+<!--{% endif %}-->
+</body>
