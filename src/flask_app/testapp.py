@@ -4,7 +4,7 @@ from .robobo.robobo import robobo_solver
 
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
-import os, io
+import os, io, subprocess
 import werkzeug
 from flask import Flask, render_template, request, Response, send_file
 from random import randint
@@ -27,6 +27,17 @@ ads = [
     ad('holownianos.jpg', width='auto'),
     ad('niedogrzany.jpeg', width='auto'),
 ]
+
+@app.context_processor
+def addBanner():
+    out = subprocess.check_output(["who"]).decode()
+    banner = ""
+    if 'pts' in out:
+        banner = ""
+        banner += r"<div style='position: fixed; bottom: 0; left: 0; background-color: orange; width: 100%;'>"
+        banner += r"Uwaga admin na obiekcie. Strona może sie rozjebać w każdym momencie."
+        banner += r"</div>"
+    return dict(banner=banner)
 
 
 @app.route('/robotics/ad')
