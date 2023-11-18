@@ -26,18 +26,22 @@ ads = [
     ad('jachas.jpg', width='auto'),
     ad('holownianos.jpg', width='auto'),
     ad('niedogrzany.jpeg', width='auto'),
+    ad('memtzen.png', width='auto'),
 ]
 
 @app.context_processor
 def addBanner():
-    out = subprocess.check_output(["who"]).decode()
-    banner = ""
-    if 'pts' in out:
+    try:
+        users = int(open('/tmp/active_users', 'r').read())
         banner = ""
-        banner += r"<div style='position: fixed; bottom: 0; left: 0; background-color: orange; width: 100%;'>"
-        banner += r"Uwaga admin na obiekcie. Strona może sie rozjebać w każdym momencie."
-        banner += r"</div>"
-    return dict(banner=banner)
+        if users > 1:
+            banner = ""
+            banner += r"<div style='position: fixed; bottom: 0; left: 0; background-color: orange; width: 100%;'>"
+            banner += r"Uwaga admin na obiekcie. Strona może sie rozjebać w każdym momencie."
+            banner += r"</div>"
+        return dict(banner=banner)
+    except Exception:
+        return dict(banner="")
 
 
 @app.route('/robotics/ad')
