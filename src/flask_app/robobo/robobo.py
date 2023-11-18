@@ -2,6 +2,7 @@
 from typing import Tuple, List
 from math import *
 import matplotlib.pyplot as plt
+from numpy import sign
 
 from latex2mathml.converter import convert as mathml
 
@@ -23,11 +24,11 @@ class robobo_arc:
         print(f"a = {a}")
         if a is None:
             self.alpha_suspected = acos((R-I)/(R+A))
-            self._a = (delta - 2*self.beta)/(2*self.alpha_suspected)
+            self._a = (abs(delta) - 2*self.beta)/(2*self.alpha_suspected)
             self.a = ceil(self._a) if not (self._a).is_integer() else self._a
         else:
             self.a = a
-        self.alpha = (delta - 2*self.beta)/(2*self.a)
+        self.alpha = abs((delta - 2*self.beta)/(2*self.a))
 
     def getPoints(self) -> List[Tuple[float, float]]:
         points = [self.getPoint(n) for n in range(0,self.a+1)]
@@ -41,7 +42,7 @@ class robobo_arc:
     def getGamma(self, n: int):
         if n == self.a+1:
             return self.delta
-        return self.beta + n*2*self.alpha
+        return sign(self.delta) * (self.beta + n*2*self.alpha)
 
     def getMathML(self):
         res = ""

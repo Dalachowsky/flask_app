@@ -6,9 +6,32 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 import os, io
 import werkzeug
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, send_file
+from random import randint
 
 app = Flask(__name__)
+
+class ad:
+
+    def __init__(self, path: str, width: str):
+        self.path = '/static/ads/' + path
+        self.width = width
+
+    def getHTML(self):
+        return f'<img src={self.path} width={self.width} style="margin: 20px">'
+
+ads = [
+    ad('lecina.jpg', width='60%'),
+    ad('lecina2.jpg', width='60%'),
+    ad('jachas.jpg', width='auto'),
+    ad('holownianos.jpg', width='auto'),
+    ad('niedogrzany.jpeg', width='auto'),
+]
+
+
+@app.route('/robotics/ad')
+def ad():
+    return send_file( os.getcwd() + ads[randint(0, len(ads) - 1)].path, mimetype='image/gif')
 
 @app.route('/robotics')
 def robotics():
