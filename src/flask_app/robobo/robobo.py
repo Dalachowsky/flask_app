@@ -84,17 +84,25 @@ class robobo_arc:
         res += mathml(f"\\alpha_{{rz}} = \\frac{{\\delta - 2\\beta}}{{2a}} = {round(degrees(self.alpha), 2)}^{{\\circ}}") + "<br>"
         res += mathml(f"PK = (Rcos(\\delta), Rsin(\\delta))") + '<br>'
         res += '<table border="1px solid black">\n'
-        res += "<tr><td>l.p</td><td>&gamma; [&deg;]</td><td>P</td></tr>\n"
+        res += "<tr><td>l.p</td><td>&gamma;=</td><td>&gamma; [&deg;]</td><td>P =</td><td>P</td></tr>\n"
         for n, point in enumerate(self.getPoints()):
             if n == 0:
                 lp = "PS"
+                gamma_eq = "0"
+                p_eq = "(R,0)"
             elif n == self.a + 2:
                 lp = "PK"
+                gamma_eq = f"&delta; = {round(degrees(self.delta))}"
+                p_eq = mathml(f"(Rcos(\\delta),Rsin(\\delta))")
             else:
                 lp = n - 1
+                gamma_eq = mathml(f"\\beta + {n}\\gamma = {round(degrees(self.beta), 2)} + {round(degrees(2*self.getGamma(n)), 2)}")
+                p_eq = mathml(f"(Rcos(\\gamma_{{{n-1}}}), Rsin(\\gamma_{{{n-1}}}))")
             res += "<tr>\n"
             res += f"<td>{lp}</td>\n"
+            res += f"<td>{gamma_eq}</td>"
             res += f"<td>{round(degrees(self.getGamma(n)), 2)}</td>"
+            res += f"<td>{p_eq}</td>"
             res += f"<td>({', '.join([str(round(i, 2)) for i in point])})</td>"
             res += "</tr>\n"
         res += "</table>"
