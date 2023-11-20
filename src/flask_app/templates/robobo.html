@@ -46,14 +46,23 @@
 </form>
 </div>
 {% if mathml is defined %}
-<div class="section" style="width: fit-content; display: flex;">
+<div class="section" style="width: fit-content; display: flex; flex-direction: column;">
 <div>
-    <h2>Schemat</h2>
-    <img src="/robotics/robobo/plot?R={{R}}&L={{L}}&delta={{delta}}&alpha={{alpha}}&x={{x}}&y={{y}}&n={{n}}">
+    <h2>1. Łuk ze środkiem w punkcie (0,0)</h2>
+    <div style="display: flex; flex-direction: row;">
+        <img style="height: fit-content;" src="/polibuda/robobo/plot_arc?R={{R}}&L={{L}}&delta={{delta}}&alpha={{alpha}}&x={{x}}&y={{y}}&n={{n}}">
+        <div style="display: flex; flex-direction: column;">
+        <h2>Obliczenia</h2>
+        {{mathml | safe}}
+        </div>
+    </div>
+</div>
+<div>
+    <h2>2. Tor robota</h2>
+    <h4>[WORK IN PROGRESS]</h4>
+    <img src="/polibuda/robobo/plot?R={{R}}&L={{L}}&delta={{delta}}&alpha={{alpha}}&x={{x}}&y={{y}}&n={{n}}">
 </div>
 <div style="width: fit-content;">
-<h2>Obliczenia</h2>
-{{ mathml | safe }}
 </div>
 {% endif %}
 </div>

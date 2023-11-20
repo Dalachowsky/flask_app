@@ -15,20 +15,22 @@ class robobo_arc:
         A: float = 0.01,
         I: float = 0.1,
         centerPoint = (0,0),
-        startPoint = None):
+        startPoint = None,
+        lineAlpha = None):
 
         self.R = R
         self.delta = delta
         self.A = A
         self.I = I
         self.centerPoint = centerPoint
+        self.lineAlpha = lineAlpha
         if startPoint is not None:
             self.startPoint = startPoint
         else:
             self.startPoint = (self.centerPoint[0] + self.R, self.centerPoint[1])
 
         self.beta = acos(R / (R+A))
-        print(f"a = {a}")
+        self.alpha_suspected = 0
         if a is None:
             self.alpha_suspected = acos((R-I)/(R+A))
             self._a = (abs(delta) - 2*self.beta)/(2*self.alpha_suspected)
@@ -44,9 +46,23 @@ class robobo_arc:
     def getPoint(self, n: int) -> Tuple[float, float]:
         if n == 0:
             return self.startPoint
-        if n == self.a + 2:
-            return ((self.R)*cos(self.getGamma(n)), (self.R)*sin(self.getGamma(n)))
-        return ((self.R + self.A)*cos(self.getGamma(n)), (self.R + self.A)*sin(self.getGamma(n)))
+
+        if self.lineAlpha is None:
+            if n == self.a + 2:
+                return ((self.R)*cos(self.getGamma(n)), (self.R)*sin(self.getGamma(n)))
+            else:
+                return ((self.R + self.A)*cos(self.getGamma(n)), (self.R + self.A)*sin(self.getGamma(n)))
+        else:
+            if n == self.a + 2:
+                return (
+                    (self.R)*cos(self.getGamma(n) - pi + self.lineAlpha) + self.centerPoint[0], 
+                    (self.R)*sin(self.getGamma(n) - pi + self.lineAlpha) + self.centerPoint[1]
+                    )
+            else:
+                return (
+                    (self.R + self.A)*cos(self.getGamma(n) - pi + self.lineAlpha) + self.centerPoint[0], 
+                    (self.R + self.A)*sin(self.getGamma(n) - pi + self.lineAlpha) + self.centerPoint[1]
+                    )
 
     def getGamma(self, n: int):
         if n == 0:
@@ -66,11 +82,18 @@ class robobo_arc:
             pass
         res += mathml(f"a = {self.a}") + "<br>"
         res += mathml(f"\\alpha_{{rz}} = \\frac{{\\delta - 2\\beta}}{{2a}} = {round(degrees(self.alpha), 2)}^{{\\circ}}") + "<br>"
+        res += mathml(f"PK = (Rcos(\\delta), Rsin(\\delta))") + '<br>'
         res += '<table border="1px solid black">\n'
         res += "<tr><td>l.p</td><td>&gamma; [&deg;]</td><td>P</td></tr>\n"
         for n, point in enumerate(self.getPoints()):
+            if n == 0:
+                lp = "PS"
+            elif n == self.a + 2:
+                lp = "PK"
+            else:
+                lp = n - 1
             res += "<tr>\n"
-            res += f"<td>{n}</td>\n"
+            res += f"<td>{lp}</td>\n"
             res += f"<td>{round(degrees(self.getGamma(n)), 2)}</td>"
             res += f"<td>({', '.join([str(round(i, 2)) for i in point])})</td>"
             res += "</tr>\n"
@@ -86,10 +109,7 @@ class robobo_arc:
         x, y = zip(*points)
         ax.plot(x, y, "b")
         ax.plot(x, y, "+")
-        ax.plot()
 
-        #ax.set_xlim(-10, 80)
-        #ax.set_ylim(-10, 80)
         ax.axhline(0, color='black', linewidth=.5)
         ax.axvline(0, color='black', linewidth=.5)
         ax.grid(True)
@@ -118,17 +138,52 @@ class robobo_solver:
         self.delta = radians(delta)
         self.A = A
         self.I = I
-
-        if a is not None:
-            self.arc = robobo_arc(self.R, self.delta, a=a)
-        else:
-            self.arc = robobo_arc(self.R, self.delta)
+        self.a = a
 
         self.mathMLString = ""
 
-    def generateArcPlot(self):
-        return self.arc.getPlot()
+    def generatePlot(self):
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        points = []
+        points.append(self.P)
+        points.append( 
+            (self.P[0] + self.L*cos(self.alpha), 
+            (self.P[1] + self.L*sin(self.alpha)))
+            )
+
+        # Find arc center point
+        arcCenterPoint = (
+            points[-1][0] + (self.R * cos(self.alpha)),
+            points[-1][1] + (self.R * sin(self.alpha))
+        )
+        ax.plot(arcCenterPoint[0], arcCenterPoint[1], '+r')
+        ax.text(
+            arcCenterPoint[0], 
+            arcCenterPoint[1], 
+            f"({round(arcCenterPoint[0])}, {round(arcCenterPoint[1])})")
+
+        arc = robobo_arc(self.R, self.delta, centerPoint=arcCenterPoint, startPoint=points[-1], lineAlpha=self.alpha)
+
+        points += arc.getPoints()
+
+        ax.plot(*zip(*points))
+        ax.plot(*zip(*points), '+r')
+
+        ax.axvline(0)
+        ax.axhline(0)
+
+
+        plt.axis('Scaled')
+        ax.grid(True, which='both')
+        fig.set_facecolor('aliceblue')
+        ax.set_facecolor('aliceblue')
+
+        return fig
 
 if __name__ == "__main__":
-    solver = robobo_solver((0,0), 30, 100, 100, 100) 
-    print(solver.arc.getMathML())
+    solver = robobo_solver((0,0), 45, 100, 100, 90) 
+    solver.generatePlot().show()
+    plt.show()

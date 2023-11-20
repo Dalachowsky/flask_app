@@ -26,6 +26,18 @@ def print_coords(ax: plt.Axes, x, y, z, r: R = None, scale=10):
     ax.quiver(x, y, z, *y_v).set_color("g")
     ax.quiver(x, y, z, *z_v)
 
+def mathmlMatrix(self, matrix: list):
+    res = "[<mtable>"
+    for row in matrix.A:
+        res += "<mtr>"
+        for c in row:
+            if isinstance(c, str):
+                res += f"<mtd>{c}</mtd>\n"
+            else:
+                res += f"<mtd>{round(c, 2)}</mtd>\n"
+        res += "</mtr>"
+    res += "</mtable>]"
+
 class dh_transition:
 
     def __init__(self, idx: int, entry: dh_entry):
@@ -220,12 +232,20 @@ class dh_solver:
         # Print coordinate markers
         point_prev = None
         coords_scale = abs((h_max-h_min)*0.15)
+        r = 1
         print(f"scale: {coords_scale}")
-        for p in points:
+        for i, p in enumerate(points):
             print(f"p: {p}")
             if point_prev != p:
-                print("coors")
-                print_coords(ax, *p, scale=coords_scale)
+                print(i)
+                try: 
+                    r *= self._transitions[i-1].matrix[:3,:3]
+                    print_coords(ax, *p, 
+                        r=R.from_matrix(r),
+                        scale=coords_scale)
+                except Exception as e:
+                    print_coords(ax, *p, 
+                        scale=coords_scale)
             point_prev = p
 
         ax.text(0, 0, 0, "(0,0)")

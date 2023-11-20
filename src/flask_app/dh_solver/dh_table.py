@@ -5,10 +5,27 @@ from numpy import deg2rad
 class dh_entry:
 
     def __init__(self, a: float = 0, d: float = 0, alpha: float = 0, theta: float = 0):
-        self.a = float(a)
-        self.d = float(d)
-        self.alpha = deg2rad(float(alpha))
-        self.theta = deg2rad(float(theta))
+        self.variables = {}
+        try:
+            self.a = float(a)
+        except ValueError:
+            self.a = 0
+            self.variables['a'] = str(a)
+        try:
+            self.d = float(d)
+        except ValueError:
+            self.d = 0
+            self.variables['d'] = str(d)
+        try:
+            self.alpha = deg2rad(float(alpha))
+        except ValueError:
+            self.alpha = 0
+            self.variables['alpha'] = str(alpha)
+        try:
+            self.theta = deg2rad(float(theta))
+        except ValueError:
+            self.theta = 0
+            self.variables['theta'] = str(theta)
 
 class dh_table:
 
